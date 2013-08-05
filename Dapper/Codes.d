@@ -260,11 +260,3 @@ string SGR_NO_UNDERLINE = "24"; /// ditto
 	 * ----
 	 **/
 string SGR_RESET = "0";
-
-
-void main()
-{
-	import std.stdio;
-	write(CSI, 1, SEPARATOR, 1, MOVE_CURSOR_TERMINATOR);
-	write(CSI, CLEAR_AFTER_TERMINATOR);
-}
