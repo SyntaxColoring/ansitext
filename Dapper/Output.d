@@ -54,7 +54,7 @@ private
 			in { assert (ColorCode < 256); }
 			body
 			{
-				string Code = SGRParameter ~ SGR_SEPARATOR ~ to!string(ColorCode);
+				string Code = SGRParameter ~ SEPARATOR ~ to!string(ColorCode);
 				InternalFormatter = NestableFormatter(Code);
 			}
 			
@@ -73,7 +73,7 @@ private
 				const uint IntegralGreen = cast(uint)(Green * 6 + 0.5);
 				const uint IntegralBlue = cast(uint)(Blue * 6 + 0.5);
 				
-				const uint ColorCode = Red*36 + Green*6 + Blue + 16;
+				const uint ColorCode = IntegralRed*36 + IntegralGreen*6 + IntegralBlue + 16;
 				
 				this(ColorCode);
 			}
@@ -120,4 +120,3 @@ immutable
 	alias NestableCustomColorFormatter!SGR_TEXT_256_COLOR CustomColor;
 	alias NestableCustomColorFormatter!SGR_BG_256_COLOR CustomColorBG;
 }
-
