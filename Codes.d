@@ -79,6 +79,9 @@ string SGR_BG_CYAN = "46"; /// ditto
 string SGR_BG_WHITE = "47"; /// ditto
 string SGR_BG_COLORLESS = "49"; /// ditto
 
+string SGR_TEXT_256_COLOR = "38" ~ SGR_SEPARATOR ~ "5";
+string SGR_BG_256_COLOR = "48" ~ SGR_SEPARATOR ~ "5";
+
 	/**
 	 * Makes all subsequently-output text bolder and/or brighter than normal.
 	 *
