@@ -2,25 +2,20 @@
 	/**
 	 * Conveniently format terminal output in various ways.
 	 *
-	 * Formatting_Functions:
-	 * Formatting functions work from within the standard $(STDREF stdio, write)
-	 * and $(STDREF stdio, writeln) output functions, like so:
-	 *
+	 * Formatters:
+	 * Formatters change the appearance of text.  They work from within the standard
+	 * $(STDREF stdio, write) and $(STDREF stdio, writeln) output functions, like so:
 	 * ---
 	 * writeln("One fish two fish ", Red("red fish "), Blue("blue fish")); // "Red fish" and "blue fish" will be in color in the terminal window.
 	 * ---
-	 *
-	 * Like $(D writeln), the formatting functions accept any number and type
+	 * Like $(D writeln), formatters accept any number and type
 	 * of arguments:
-	 *
 	 * ---
 	 * writeln(1, " fish ", 1 + 1, " fish"); // Prints "1 fish 2 fish"
 	 * writeln(Green(1, " fish ", 1 + 1, " fish")); // Same thing, only now the text will be green.
 	 * ---
-	 *
-	 * All formatting functions can nest seamlessly within one another.  There's no limit
+	 * All formatters can nest seamlessly within one another.  There's no limit
 	 * imposed on how deeply the nesting can go.
-	 *
 	 * ---
 	 * // "Never press the red button!"
 	 * writeln(Underline(Bold("Never"), " press the ", Red("red button!")); // Everything underlined, "never" bolded and "red button" in red.
@@ -31,15 +26,13 @@
 	 * // "OoOoO You're under arrest! OoOoO"
 	 * writeln(Blue(Blink("OoOoO ", NoFormatting("You're under arrest!"), " OoOoO"))); // The "O"s are blue and blinking.
 	 * ---
-	 *
-	 * $(B Note:) Use $(D ,) (comma) instead of $(D ~) for concatenating text from
-	 * nested formatting functions.  Formatting functions that aren't nested at all
-	 * or that form the outermost layer of the nest $(EM can) be safely concatenated if they're
-	 * cast to a string beforehand.  This lets you use the formatting functions with
+	 * $(B Note on concatenation:) Use $(D ,) (comma) instead of $(D ~) for concatenating text from
+	 * nested formatters.  Only formatters that aren't nested at all
+	 * or that form the outermost layer of the nest can be safely concatenated - just
+	 * cast them to a string beforehand.  This lets you use the formatters with
 	 * $(STDREF stdio, writef) format strings, if you so choose.  However, there's no
 	 * built-in check to make sure that what you're casting is unnested or on the
 	 * outermost layer, so be careful.
-	 * 
 	 * ---
 	 * writeln(Green(Underline("Hello") ~ " world!")); // Compilation error.
 	 * writeln(Green(cast(string)(Underline("Hello")) ~ " world!")); // Compiles, but won't display correctly.
@@ -49,6 +42,19 @@
 	 * string formatString = "Date: " ~ cast(string)Underline("%2$s") ~ " %1$s";
 	 * writefln(formatString, "October", 5); // Also works fine.  "Date: 5 October" with the 5 underlined.
 	 * ---
+	 * See the reference documentation below for a full list of formatters.
+	 *
+	 *
+	 * Other_Functions:
+	 * This module also contains a few regular functions that operate outside $(D writeln): 
+	 * $(UL
+	 * $(LI $(MREF MoveCursor))
+	 * $(LI $(MREF SetCursorVisibility))
+	 * $(LI $(MREF Clear))
+	 * )
+	 * 
+	 * See_Also:
+	 * $(DPMODULE Codes), which provides the foundation for this module.
 	 **/
 
 module Dapper.Output;
@@ -64,7 +70,7 @@ private
 		 * Internally-used functor used to implement formatters like Red() and
 		 * their ability to nest properly within each other.
 		 *
-		 * The library initializes a NestableFormatter with an SGR parameter.
+		 * The library initializes a Formatter with an SGR parameter.
 		 * Afterwards, when it is called as a function in calling code, that
 		 * SGR parameter is applied to each of the arguments that the calling code
 		 * passed in to be output.  This is done in a way designed to work with nesting.
@@ -73,7 +79,7 @@ private
 		 * functions for making text colored, bold, underlined, etc., all the important logic
 		 * for formatting can live here in one place.
 		 **/
-	struct NestableFormatter
+	struct Formatter
 	{
 			/**
 			 * Helper struct used to preserve the separateness of arguments passed
@@ -81,13 +87,15 @@ private
 			 * is of this type, it basically signals to that formatter that this came
 			 * from another formatter and that it must be handled specially so
 			 * that nesting works.
-			 * 
-			 * The outer layers need to apply their codes to each argument individually
-			 * to ensure proper nesting, so the inner layers have to return this
-			 * instead of concatenating all their arguments into a single string.
-			 * The arguments are concatenated in this struct's toString() member
-			 * function, which is called by writeln after all the formatters have
-			 * done their work.
+			 *
+			 * For example, in Red(Green("A", "B"), "C"), the Red formatter receives
+			 * "A" and "B" in an ArgumentRelayer so that it can work with them
+			 * separately instead of as a single argument "AB."
+			 *
+			 * At the outermost layer of the nest, writeln receives the ArgumentRelayers
+			 * and sees that they have the toString() member function defined.  When
+			 * writeln calls an ArgumentRelayer's toString(), the ArgumentRelayer
+			 * concatenates its contained text into its final outputted form.
 			 **/
 		private struct ArgumentRelayer
 		{
@@ -99,12 +107,28 @@ private
 				foreach (Argument; Arguments)
 				{
 					ConcatenatedArguments ~= Argument;
+					
+					// The Formatter that created this ArgumentRelayer has
+					// already prepended all the necessary SGR codes to the contained
+					// arguments.  It has not, however, appended the reset code.
+					// That must be done here so that the next argument starts from
+					// a clean formatting state, and so the formatting state from the
+					// last argument doesn't persist to any text that comes after it
+					// that should be unformatted.
+					//
+					// The reason that this is done here instead of from within
+					// Formatter.opCall() is to avoid arguments being appended
+					// with many redundant reset codes as they propagate through many
+					// layers of Formatters.
 					ConcatenatedArguments ~= CSI ~ SGR_RESET ~ SGR_TERMINATOR;
 				}
 				return ConcatenatedArguments;
 			}
 			
-			string opCast(Type:string)() { return toString(); }
+			// ArgumentRelayers must occasionally be casted manually by calling code,
+			// and the "cast(string)Foo" syntax is nicer than making people import std.conv
+			// so they can use "to!string(Foo)."
+			string opCast(Type:string)() const { return toString(); }
 		}
 		
 		private const string SGRParameter;
@@ -112,6 +136,8 @@ private
 		@disable this();
 		this(const string SGRParameter) { this.SGRParameter = SGRParameter; }
 		
+		// This is what calling code calls.  writeln(Red("Foo")) is actually
+		// writeln(Red.opCall("Foo")).
 		ArgumentRelayer opCall(Types...)(Types IncomingArguments) const
 		{
 			string[] OutgoingArguments;
@@ -148,33 +174,35 @@ private
 	}
 	
 		/**
-		 * Functor for supporting xterm 256 colors.
+		 * Functions for supporting xterm 256 colors.
 		 *
-		 * Calling code instantiates this functor, but it still doesn't call it
-		 * by name.  Instead, it's accessed by aliases that take care of the
-		 * template parameter.
+		 * These functions take an xterm-256 color as a parameter and return a
+		 * formatter that applies the appropriate color code.
 		 *
-		 * The reason that template parameter is necessary is to factor out the
-		 * distinction between setting the text color and setting the background
-		 * color.
+		 * The template parameter factors out the distinction between setting
+		 * the background color and setting the text color.  It's only a difference
+		 * of one digit in the ANSI escape code, and it would be silly to define
+		 * two separate sets of functions just for that.
+		 *
+		 * Client code accesses these functions through aliases that take care of
+		 * the template parameter.  (See "CustomColor" and "CustomColorBG" below.)
 		 **/
-	template NestableCustomColorFormatter(const string SGRParameter)
+	template Create256ColorFormatter(const string SGRParameter)
 	{
-		struct NestableCustomColorFormatter
+		// The functions themselves need to be public within the template for the
+		// aliases to work outside this module.  Even with them public, calling code
+		// still can't access them directly because the enclosing template is private.
+		public
 		{
-			private const NestableFormatter InternalFormatter;
-			
-			@disable this();
-			
-			this(const uint ColorCode)
+			Formatter Create256ColorFormatter(const uint ColorCode)
 			in { assert (ColorCode < 256); }
 			body
 			{
 				string Code = SGRParameter ~ SEPARATOR ~ to!string(ColorCode);
-				InternalFormatter = NestableFormatter(Code);
+				return Formatter(Code);
 			}
 			
-			this(const double Red, const double Green, const double Blue)
+			Formatter Create256ColorFormatter(const double Red, const double Green, const double Blue)
 			in
 			{
 				assert (0.0 <= Red && Red <= 1.0);
@@ -183,18 +211,19 @@ private
 			}
 			body
 			{
+				// Somewhat incomplete conversion from RGB to xterm 256.  The xterm
+				// 256 palette has a separate grayscale ramp that this function
+				// currently makes no attempt to take advantage of.  That means that
+				// grayscale values passed to this function overload will end up being
+				// displayed with a significantly lower precision than what they
+				// potentially could be.
 				const uint IntegralRed = cast(uint)(Red * 5 + 0.5);
 				const uint IntegralGreen = cast(uint)(Green * 5 + 0.5);
 				const uint IntegralBlue = cast(uint)(Blue * 5 + 0.5);
 				
 				const uint ColorCode = IntegralRed*36 + IntegralGreen*6 + IntegralBlue + 16;
 				
-				this(ColorCode);
-			}
-			
-			string opCall(Types...)(Types ContainedArguments) const
-			{
-				return InternalFormatter(ContainedArguments);
+				return Create256ColorFormatter!SGRParameter(ColorCode);
 			}
 		}
 	}
@@ -202,67 +231,182 @@ private
 
 immutable
 {
-	auto Black        = NestableFormatter(SGR_TEXT_BLACK);
-	auto Red          = NestableFormatter(SGR_TEXT_RED);
-	auto Green        = NestableFormatter(SGR_TEXT_GREEN);
-	auto Yellow       = NestableFormatter(SGR_TEXT_YELLOW);
-	auto Blue         = NestableFormatter(SGR_TEXT_BLUE);
-	auto Magenta      = NestableFormatter(SGR_TEXT_MAGENTA);
-	auto Cyan         = NestableFormatter(SGR_TEXT_CYAN);
-	auto White        = NestableFormatter(SGR_TEXT_WHITE);
-	auto Colorless    = NestableFormatter(SGR_TEXT_COLORLESS);
+		/**
+		 * Formatters for changing the text or background color to one of eight presets.
+		 *
+		 * These presets are defined by the terminal's color scheme.  Therefore,
+		 * on some terminals, these formatters can actually result in completely
+		 * different colors being displayed.  $(MREF CustomColor) does not have
+		 * this problem.
+		 **/
+	auto Black     = Formatter(SGR_TEXT_BLACK);
+	auto Red       = Formatter(SGR_TEXT_RED);     /// ditto
+	auto Green     = Formatter(SGR_TEXT_GREEN);   /// ditto
+	auto Yellow    = Formatter(SGR_TEXT_YELLOW);  /// ditto
+	auto Blue      = Formatter(SGR_TEXT_BLUE);    /// ditto
+	auto Magenta   = Formatter(SGR_TEXT_MAGENTA); /// ditto
+	auto Cyan      = Formatter(SGR_TEXT_CYAN);    /// ditto
+	auto White     = Formatter(SGR_TEXT_WHITE);   /// ditto
 	
-	auto BlackBG      = NestableFormatter(SGR_BG_RED);
-	auto RedBG        = NestableFormatter(SGR_BG_RED);
-	auto GreenBG      = NestableFormatter(SGR_BG_GREEN);
-	auto YellowBG     = NestableFormatter(SGR_BG_YELLOW);
-	auto BlueBG       = NestableFormatter(SGR_BG_BLUE);
-	auto MagentaBG    = NestableFormatter(SGR_BG_MAGENTA);
-	auto CyanBG       = NestableFormatter(SGR_BG_CYAN);
-	auto WhiteBG      = NestableFormatter(SGR_BG_WHITE);
-	auto ColorlessBG  = NestableFormatter(SGR_BG_COLORLESS);
+	auto BlackBG   = Formatter(SGR_BG_RED);       /// ditto
+	auto RedBG     = Formatter(SGR_BG_RED);       /// ditto
+	auto GreenBG   = Formatter(SGR_BG_GREEN);     /// ditto
+	auto YellowBG  = Formatter(SGR_BG_YELLOW);    /// ditto
+	auto BlueBG    = Formatter(SGR_BG_BLUE);      /// ditto
+	auto MagentaBG = Formatter(SGR_BG_MAGENTA);   /// ditto
+	auto CyanBG    = Formatter(SGR_BG_CYAN);      /// ditto
+	auto WhiteBG   = Formatter(SGR_BG_WHITE);     /// ditto
 	
-	auto Bold         = NestableFormatter(SGR_BOLD);
-	auto NoBold       = NestableFormatter(SGR_NO_BOLD);
+		/**
+		 * Formatters to set the text or background color to the default, normal color.
+		 * 
+		 * As above, these colors are defined by the terminal's configuration.
+		 * However, these defaults aren't necessarily the same color as any of
+		 * the above presets.  Therefore, when you want to go back to
+		 * "normal-colored text," you should use these.
+		 *
+		 * Examples:
+		 * ---
+		 * writeln(CyanBG(Black(1, NoColorBG(2), 3))); // 1 and 3 will be black on cyan.  2 will be black on a normal background.
+		 * 
+		 * writeln(CyanBG(Black(1, NoColor(2), 3))); // 1 and 3 will be black on cyan.  2 will be normal text on a cyan background.
+		 * ---
+		 **/
+	auto NoColor   = Formatter(SGR_TEXT_COLORLESS);
+	auto NoColorBG = Formatter(SGR_BG_COLORLESS); /// ditto
 	
-	auto Blink        = NestableFormatter(SGR_BLINK);
-	auto NoBlink      = NestableFormatter(SGR_NO_BLINK);
+		/**
+		 * Formatters to enable or disable font boldness, respectively.
+		 * 
+		 * Many terminals make the text bright in addition to - or instead of - the text being bold.
+		 **/
+	auto Bold   = Formatter(SGR_BOLD);
+	auto NoBold = Formatter(SGR_NO_BOLD); /// ditto
 	
-	auto Underline    = NestableFormatter(SGR_UNDERLINE);
-	auto NoUnderline  = NestableFormatter(SGR_NO_UNDERLINE);
+		/**
+		 * Formatters to make the text blink indefinitely or turn blinking off, respectively.
+		 *
+		 * Only the text itself blinks; the background behind it remains constant.
+		 * Sections of text output with this formatter blink in-sync with each
+		 * each other, even if the sections aren't contiguous.
+		 **/
+	auto Blink   = Formatter(SGR_BLINK);
+	auto NoBlink = Formatter(SGR_NO_BLINK); /// ditto
 	
-	auto NoFormatting = NestableFormatter(SGR_RESET);
+		/**
+		 * Formatters to enable or disable text underlining, respectively.
+		 **/
+	auto Underline   = Formatter(SGR_UNDERLINE);
+	auto NoUnderline = Formatter(SGR_NO_UNDERLINE); /// ditto
 	
-	alias NestableCustomColorFormatter!SGR_TEXT_256_COLOR CustomColor;
-	alias NestableCustomColorFormatter!SGR_BG_256_COLOR CustomColorBG;
+		/**
+		 * Formatter for clearing the text and its background of all formatting effects.
+		 *
+		 * While this is the same in practice as using $(D NoColor), $(D NoColorBG),
+		 * $(D NoBold), etc. all at once, this also disables formatting effects that
+		 * Dapper does not support.
+		 **/
+	auto NoFormatting = Formatter(SGR_RESET);
+	
+		/**
+		 * Functions for supporting colors beyond the 8 preset values.
+		 *
+		 * Don't let the ugly alias declaration fool you - they're actually quite simple.
+		 * Give one of these functions an $(HTTP en.wikipedia.org/wiki/RGB_color_model, RGB)
+		 * or $(HTTP en.wikipedia.org/wiki/Xterm, xterm 256 color) and it will return a
+		 * formatter for you to use.  For example:
+		 *
+		 * ---
+		 * auto BrightRed = CustomColor(1.0, 0.0, 0.0); // RGB is accepted as three doubles from 0.0 to 1.0.
+		 * auto OrangeBG = CustomColorBG(208); // Colors from the xterm palette are accepted as a single uint from 0 to 255.
+		 *
+		 * // Having created the formatters, you can use them normally.
+		 * writeln("Paint the town ", Red("red."));
+		 * writeln("Here comes the ", OrangeBG("sun!"));
+		 *
+		 * // You can also create them inline, if that's more convenient.
+		 * writeln("The grass is always ", CustomColor(0.0, 1.0, 0.0)("greener..."));
+		 * ---
+		 * Nesting works as it normally would, and $(MREF NoFormatting) and $(MREF NoColor)
+		 * still work as expected with custom colors.
+		 *
+		 * Unlike the preset color formatters like $(MREF Black), these will look the
+		 * same from terminal to terminal.  Keep in mind, though, that your text may
+		 * be difficult to read if you use a custom text color without a custom background color
+		 * (or vice versa).
+		 **/
+	alias CustomColor   = Create256ColorFormatter!SGR_TEXT_256_COLOR;
+	alias CustomColorBG = Create256ColorFormatter!SGR_BG_256_COLOR; /// ditto
 }
 
-// TODO: Figure out x-y vs. row-col, 1-index vs. 0-index.
-// Remember to update Clear!
+	/**
+	 * Moves the terminal cursor to the given row and column.  Row 0, Column 0
+	 * is the top-left of the terminal.
+	 *
+	 * Use this to change where in the terminal window standard output will
+	 * be displayed.  Keep in mind that newlines will reset the column to the
+	 * far left.
+	 **/
 void MoveCursor(const uint Row, const uint Column)
 {
-	write(CSI, Row, SEPARATOR, Column, MOVE_CURSOR_TERMINATOR);
+	write(CSI, Row + 1, SEPARATOR, Column + 1, MOVE_CURSOR_TERMINATOR);
 }
 
+	/**
+	 * Sets whether or not the terminal cursor is displayed in the terminal.
+	 * You may want to set this to $(D false) if you're programming a game or
+	 * something and you don't want the cursor to be distracting.
+	 *
+	 * $(B Warning:) Remember to set this back to $(D true) at some point, or the cursor
+	 * will stay invisible after your program exits!  This may be handled
+	 * automatically by the library in the future.
+	 **/
 void SetCursorVisibility(const bool Visible)
 {
 	write(CSI, (Visible ? SHOW_CURSOR_TERMINATOR : HIDE_CURSOR_TERMINATOR));
 }
 
-void Clear(ClearMode Portion = ClearMode.ENTIRE_SCREEN)
+	/**
+	 * Clears visible text from the terminal screen.  (For clearing formatting
+	 * effects from a section of text, see $(MREF NoFormatting).)
+	 *
+	 * The Mode parameter decides which part of the screen to clear.  The valid forms are:
+	 * ---
+	 * Clear(); // Erase all the visible text on the screen and move the cursor to the top-left.
+	 * Clear(ClearMode.ENTIRE_SCREEN); // Same thing as above.
+	 * 
+	 * Clear(ClearMode.ENTIRE_SCREEN_ALLOW_SCROLL); // Like above, but also allow the terminal to
+	 *                                              // clear the screen by outputting a bunch of
+	 *                                              // blank lines to push the text out of view.
+	 *                                              // One some terminals, this behaves exactly
+	 *                                              // like the forms above.
+	 *
+	 * Clear(ClearMode.CURSOR_TO_FIRST); // Erase the text from where the cursor is to the first
+	 *                                   // character space on the screen, in the top-left corner.
+	 *
+	 * Clear(ClearMode.CURSOR_TO_LAST); // Erase the text from where the cursor is to the last
+	 *                                  // character space on the screen, in the bottom-right corner.
+	 * ---
+	 * $(D ClearMode.ENTIRE_SCREEN) is the only mode that disturbs the position of the cursor.
+	 **/
+void Clear(ClearMode Mode = ClearMode.ENTIRE_SCREEN)
 {
-	if (Portion == ClearMode.ENTIRE_SCREEN)
+	if (Mode == ClearMode.ENTIRE_SCREEN)
 	{
-		MoveCursor(1, 1);
-		Clear(ClearMode.AFTER_CURSOR);
+		// Some terminals output a bunch of blank lines when they receive the
+		// ANSI escape code to clear the entire screen.  This is a workaround
+		// that ensures the text is actually erased.  This is the default because
+		// it's what most people expect when they want to clear the screen.
+		MoveCursor(0, 0);
+		Clear(ClearMode.CURSOR_TO_LAST);
 	}
-	else write(CSI, cast(string)Portion);
+	else write(CSI, cast(string)Mode);
 }
 
 enum ClearMode: string
 {
 	ENTIRE_SCREEN = "",
 	ENTIRE_SCREEN_ALLOW_SCROLL = CLEAR_SCREEN_TERMINATOR,
-	BEFORE_CURSOR = CLEAR_BEFORE_TERMINATOR,
-	AFTER_CURSOR = CLEAR_AFTER_TERMINATOR
+	CURSOR_TO_FIRST = CLEAR_BEFORE_TERMINATOR,
+	CURSOR_TO_LAST = CLEAR_AFTER_TERMINATOR
 }
