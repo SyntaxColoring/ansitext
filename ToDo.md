@@ -1,5 +1,0 @@
-- [ ] Add reverse video formatter
-- [ ] Let client code check whether or not it's outputting to a terminal (as opposed to a file)
-- [ ] Automatically disable escape codes if not outputting to a terminal
-- [ ] Add support for raw mode
-- [ ] Terminal size (with C binding -> environment variable -> assume 80x24 fallback chain)
