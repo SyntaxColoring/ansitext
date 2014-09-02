@@ -37,15 +37,6 @@ private immutable
 	
 	string SEPARATOR = ";";
 	
-	string MOVE_CURSOR_TERMINATOR = "H";
-	
-	string CLEAR_SCREEN_TERMINATOR = "2J";
-	string CLEAR_BEFORE_TERMINATOR = "1J"; /// ditto
-	string CLEAR_AFTER_TERMINATOR = "0J"; /// ditto
-	
-	string HIDE_CURSOR_TERMINATOR = "?25l";
-	string SHOW_CURSOR_TERMINATOR = "?25h"; /// ditto
-	
 	string SGR_TERMINATOR = "m";
 	
 	string SGR_TEXT_BLACK = "30";
@@ -66,8 +57,8 @@ private immutable
 	string SGR_BG_CYAN = "46";
 	string SGR_BG_WHITE = "47";
 	
-	string SGR_TEXT_COLORLESS = "39"; /// ditto
-	string SGR_BG_COLORLESS = "49"; /// ditto
+	string SGR_TEXT_COLORLESS = "39";
+	string SGR_BG_COLORLESS = "49";
 	
 		/**
 		 * SGR parameter that sets the text or background color using the
