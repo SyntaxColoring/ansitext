@@ -1,60 +1,29 @@
-
 	/**
-	 * Conveniently format terminal output in various ways.
-	 *
-	 * Formatters:
-	 * Formatters change the appearance of text.  They work from within the standard
-	 * $(STDREF stdio, write) and $(STDREF stdio, writeln) output functions, like so:
-	 * ---
-	 * writeln("One fish two fish ", Red("red fish "), Blue("blue fish")); // "Red fish" and "blue fish" will be in color in the terminal window.
-	 * ---
-	 * Like $(D writeln), formatters accept any number and type
-	 * of arguments:
-	 * ---
-	 * writeln(1, " fish ", 1 + 1, " fish"); // Prints "1 fish 2 fish"
-	 * writeln(Green(1, " fish ", 1 + 1, " fish")); // Same thing, only now the text will be green.
-	 * ---
-	 * All formatters can nest seamlessly within one another.  There's no limit
-	 * imposed on how deeply the nesting can go.
-	 * ---
-	 * // "Never press the red button!"
-	 * writeln(Underline(Bold("Never"), " press the ", Red("red button!")); // Everything underlined, "never" bolded and "red button" in red.
-	 *
-	 * // "The D programming language"
-	 * writeln(WhiteBG("The ", RedBG("D"), " programming language")); // "D" has a red background; everything else, white.
-	 *
-	 * // "OoOoO You're under arrest! OoOoO"
-	 * writeln(Blue(Blink("OoOoO ", NoFormatting("You're under arrest!"), " OoOoO"))); // The "O"s are blue and blinking.
-	 * ---
-	 * $(B Note on concatenation:) Use $(D ,) (comma) instead of $(D ~) for concatenating text from
-	 * nested formatters.  Only formatters that aren't nested at all
-	 * or that form the outermost layer of the nest can be safely concatenated - just
-	 * cast them to a string beforehand.  This lets you use the formatters with
-	 * $(STDREF stdio, writef) format strings, if you so choose.  However, there's no
-	 * built-in check to make sure that what you're casting is unnested or on the
-	 * outermost layer, so be careful.
-	 * ---
-	 * writeln(Green(Underline("Hello") ~ " world!")); // Compilation error.
-	 * writeln(Green(cast(string)(Underline("Hello")) ~ " world!")); // Compiles, but won't display correctly.
-	 *
-	 * writeln(Green(Underline("Hello"), " world!")); // Works fine.
-	 *
-	 * string formatString = "Date: " ~ cast(string)Underline("%2$s") ~ " %1$s";
-	 * writefln(formatString, "October", 5); // Also works fine.  "Date: 5 October" with the 5 underlined.
-	 * ---
-	 * See the reference documentation below for a full list of formatters.
-	 *
-	 *
-	 * Other_Functions:
-	 * This module also contains a few regular functions that operate outside $(D writeln): 
-	 * $(UL
-	 * $(LI $(MREF MoveCursor))
-	 * $(LI $(MREF SetCursorVisibility))
-	 * $(LI $(MREF Clear))
-	 * )
+	 * Stylish enhancements for D standard output.
 	 * 
-	 * See_Also:
-	 * $(DPMODULE Codes), which provides the foundation for this module.
+	 * See ReadMe.md for an introduction and API reference.
+	 *
+	 *
+	 * License: The MIT License (MIT)
+	 *
+	 * Copyright (c) 2013 Max Marrone
+	 * 
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy of
+	 * this software and associated documentation files (the "Software"), to deal in
+	 * the Software without restriction, including without limitation the rights to
+	 * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+	 * the Software, and to permit persons to whom the Software is furnished to do so,
+	 * subject to the following conditions:
+	 * 
+	 * The above copyright notice and this permission notice shall be included in all
+	 * copies or substantial portions of the Software.
+	 * 
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+	 * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+	 * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+	 * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+	 * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 **/
 
 module Dapper;
