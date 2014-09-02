@@ -1,11 +1,11 @@
 	/**
-	 * Stylish enhancements for D standard output.
+	 * Dapper - Stylish enhancements for D standard output.
 	 * 
 	 * See ReadMe.md for an introduction and API reference.
-	 *
-	 *
+	 * 
+	 * 
 	 * License: The MIT License (MIT)
-	 *
+	 * 
 	 * Copyright (c) 2013 Max Marrone
 	 * 
 	 * Permission is hereby granted, free of charge, to any person obtaining a copy of
