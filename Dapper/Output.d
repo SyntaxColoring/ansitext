@@ -239,23 +239,23 @@ immutable
 		 * different colors being displayed.  $(MREF CustomColor) does not have
 		 * this problem.
 		 **/
-	auto Black     = Formatter(SGR_TEXT_BLACK);
-	auto Red       = Formatter(SGR_TEXT_RED);     /// ditto
-	auto Green     = Formatter(SGR_TEXT_GREEN);   /// ditto
-	auto Yellow    = Formatter(SGR_TEXT_YELLOW);  /// ditto
-	auto Blue      = Formatter(SGR_TEXT_BLUE);    /// ditto
-	auto Magenta   = Formatter(SGR_TEXT_MAGENTA); /// ditto
-	auto Cyan      = Formatter(SGR_TEXT_CYAN);    /// ditto
-	auto White     = Formatter(SGR_TEXT_WHITE);   /// ditto
+	auto black     = Formatter(SGR_TEXT_BLACK);
+	auto red       = Formatter(SGR_TEXT_RED);     /// ditto
+	auto green     = Formatter(SGR_TEXT_GREEN);   /// ditto
+	auto yellow    = Formatter(SGR_TEXT_YELLOW);  /// ditto
+	auto blue      = Formatter(SGR_TEXT_BLUE);    /// ditto
+	auto magenta   = Formatter(SGR_TEXT_MAGENTA); /// ditto
+	auto cyan      = Formatter(SGR_TEXT_CYAN);    /// ditto
+	auto white     = Formatter(SGR_TEXT_WHITE);   /// ditto
 	
-	auto BlackBG   = Formatter(SGR_BG_RED);       /// ditto
-	auto RedBG     = Formatter(SGR_BG_RED);       /// ditto
-	auto GreenBG   = Formatter(SGR_BG_GREEN);     /// ditto
-	auto YellowBG  = Formatter(SGR_BG_YELLOW);    /// ditto
-	auto BlueBG    = Formatter(SGR_BG_BLUE);      /// ditto
-	auto MagentaBG = Formatter(SGR_BG_MAGENTA);   /// ditto
-	auto CyanBG    = Formatter(SGR_BG_CYAN);      /// ditto
-	auto WhiteBG   = Formatter(SGR_BG_WHITE);     /// ditto
+	auto blackBG   = Formatter(SGR_BG_RED);       /// ditto
+	auto redBG     = Formatter(SGR_BG_RED);       /// ditto
+	auto greenBG   = Formatter(SGR_BG_GREEN);     /// ditto
+	auto yellowBG  = Formatter(SGR_BG_YELLOW);    /// ditto
+	auto blueBG    = Formatter(SGR_BG_BLUE);      /// ditto
+	auto magentaBG = Formatter(SGR_BG_MAGENTA);   /// ditto
+	auto cyanBG    = Formatter(SGR_BG_CYAN);      /// ditto
+	auto whiteBG   = Formatter(SGR_BG_WHITE);     /// ditto
 	
 		/**
 		 * Formatters to set the text or background color to the default, normal color.
@@ -272,16 +272,16 @@ immutable
 		 * writeln(CyanBG(Black(1, NoColor(2), 3))); // 1 and 3 will be black on cyan.  2 will be normal text on a cyan background.
 		 * ---
 		 **/
-	auto NoColor   = Formatter(SGR_TEXT_COLORLESS);
-	auto NoColorBG = Formatter(SGR_BG_COLORLESS); /// ditto
+	auto noColor   = Formatter(SGR_TEXT_COLORLESS);
+	auto noColorBG = Formatter(SGR_BG_COLORLESS); /// ditto
 	
 		/**
 		 * Formatters to enable or disable font boldness, respectively.
 		 * 
 		 * Many terminals make the text bright in addition to - or instead of - the text being bold.
 		 **/
-	auto Bold   = Formatter(SGR_BOLD);
-	auto NoBold = Formatter(SGR_NO_BOLD); /// ditto
+	auto bold   = Formatter(SGR_BOLD);
+	auto noBold = Formatter(SGR_NO_BOLD); /// ditto
 	
 		/**
 		 * Formatters to make the text blink indefinitely or turn blinking off, respectively.
@@ -290,14 +290,14 @@ immutable
 		 * Sections of text output with this formatter blink in-sync with each
 		 * each other, even if the sections aren't contiguous.
 		 **/
-	auto Blink   = Formatter(SGR_BLINK);
-	auto NoBlink = Formatter(SGR_NO_BLINK); /// ditto
+	auto blink   = Formatter(SGR_BLINK);
+	auto noBlink = Formatter(SGR_NO_BLINK); /// ditto
 	
 		/**
 		 * Formatters to enable or disable text underlining, respectively.
 		 **/
-	auto Underline   = Formatter(SGR_UNDERLINE);
-	auto NoUnderline = Formatter(SGR_NO_UNDERLINE); /// ditto
+	auto underline   = Formatter(SGR_UNDERLINE);
+	auto noUnderline = Formatter(SGR_NO_UNDERLINE); /// ditto
 	
 		/**
 		 * Formatter for clearing the text and its background of all formatting effects.
@@ -306,7 +306,7 @@ immutable
 		 * $(D NoBold), etc. all at once, this also disables formatting effects that
 		 * Dapper does not support.
 		 **/
-	auto NoFormatting = Formatter(SGR_RESET);
+	auto noFormatting = Formatter(SGR_RESET);
 	
 		/**
 		 * Functions for supporting colors beyond the 8 preset values.
@@ -335,6 +335,6 @@ immutable
 		 * be difficult to read if you use a custom text color without a custom background color
 		 * (or vice versa).
 		 **/
-	alias CustomColor   = Create256ColorFormatter!SGR_TEXT_256_COLOR;
-	alias CustomColorBG = Create256ColorFormatter!SGR_BG_256_COLOR; /// ditto
+	alias customColor   = Create256ColorFormatter!SGR_TEXT_256_COLOR;
+	alias customColorBG = Create256ColorFormatter!SGR_BG_256_COLOR; /// ditto
 }
