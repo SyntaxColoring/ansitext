@@ -86,19 +86,23 @@ Making Your Own Color Formatters
 If none of the 8 predefined colors work for you, you can also make your own like
 this:
 
-    // With red, green, blue components from 0.0 to 1.0
-    auto pink1 = Formatter.forColor(1.0, 0.08, 0.58);
-    
-    // With an index into the XTerm 256-color palette
-    auto pink2 = Formatter.forColor(199);
-    
-    // It works the same way for background colors.
-    auto pink1BG = Formatter.forBGColor(1.0, 0.08, 0.58);
-    auto pink2BG = Formatter.forBGColor(199);
+```d
+// With red, green, blue components from 0.0 to 1.0
+auto pink1 = Formatter.forColor(1.0, 0.08, 0.58);
+
+// With an index into the XTerm 256-color palette
+auto pink2 = Formatter.forColor(199);
+
+// It works the same way for background colors.
+auto pink1BG = Formatter.forBGColor(1.0, 0.08, 0.58);
+auto pink2BG = Formatter.forBGColor(199);
+```
 
 Then, use them like you would any other formatter.
 
-    writeln("My favorite color is ", pink1("pink."));
+```d
+writeln("My favorite color is ", pink1("pink."));
+```
 
 Merging Formatters
 ------------------
@@ -106,16 +110,20 @@ Merging Formatters
 Sometimes, you might find yourself using the same combination of formatters
 over and over again, like this:
 
-    writeln("Highlight ",          bold(white(yellowBG("this,"))));
-    writeln("and also highlight ", bold(white(yellowBG("that."))));
+```d
+writeln("Highlight ",          bold(white(yellowBG("this,"))));
+writeln("and also highlight ", bold(white(yellowBG("that."))));
+```
 
 In such cases, it might be convenient to *merge* those formatters into one.  The
 `merge()` function returns a new formatter created from the combined effects of
 whatever formatters you pass it.  Use it like this:
 
-    auto highlight = merge(bold, white, yellow);
-    
-    writeln("Highlight ",          highlight("this,"));
-    writeln("and also highlight ", highlight("that."));
+```d
+auto highlight = merge(bold, white, yellow);
+
+writeln("Highlight ",          highlight("this,"));
+writeln("and also highlight ", highlight("that."));
+```
 
 Merging formatters like this can improve readability and maintainability.
