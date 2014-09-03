@@ -40,7 +40,7 @@ private immutable
 }
 
 // Converts RGB coordinates to an XTerm 256-color palette index.
-private @safe pure ubyte rgbToXterm(double red, double green, double blue)
+private @safe nothrow pure ubyte rgbToXterm(double red, double green, double blue)
 in
 {
 	assert(red   >= 0.0 && red   <= 1.0, "RGB channels should be from 0 to 1.");
@@ -61,12 +61,12 @@ public struct Formatter
 {
 	string sgrParameters;
 	
-	this(const string sgrParameters...)
+	@safe nothrow pure this(const string sgrParameters...)
 	{
 		this.sgrParameters = sgrParameters;
 	}
 	
-	ArgumentRelayer opCall(Types...)(Types incomingArguments) const
+	@safe nothrow pure ArgumentRelayer opCall(Types...)(Types incomingArguments) const
 	{
 		string[] outgoingArguments;
 		
@@ -149,6 +149,11 @@ private struct ArgumentRelayer
 	// and the "cast(string)Foo" syntax is nicer than making people import std.conv
 	// so they can use "to!string(Foo)."
 	string opCast(Type:string)() const { return toString(); }
+}
+
+public @safe nothrow pure Formatter customColor(double r, double g, double b)
+{
+	return Formatter("38" ~ SEPARATOR ~ "5" ~ SEPARATOR ~ to!string(rgbToXterm(r, g, b)));
 }
 
 immutable public
