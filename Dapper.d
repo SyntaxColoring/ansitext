@@ -204,61 +204,6 @@ private
 			return ArgumentRelayer(outgoingArguments);
 		}
 	}
-	
-		/**
-		 * Functions for supporting xterm 256 colors.
-		 *
-		 * These functions take an xterm-256 color as a parameter and return a
-		 * formatter that applies the appropriate color code.
-		 *
-		 * The template parameter factors out the distinction between setting
-		 * the background color and setting the text color.  It's only a difference
-		 * of one digit in the ANSI escape code, and it would be silly to define
-		 * two separate sets of functions just for that.
-		 *
-		 * Client code accesses these functions through aliases that take care of
-		 * the template parameter.  (See "CustomColor" and "CustomColorBG" below.)
-		 **/
-	template Create256ColorFormatter(const string SGRParameter)
-	{
-		// The functions themselves need to be public within the template for the
-		// aliases to work outside this module.  Even with them public, calling code
-		// still can't access them directly because the enclosing template is private.
-		public
-		{
-			Formatter Create256ColorFormatter(const uint ColorCode)
-			in { assert (ColorCode < 256); }
-			body
-			{
-				string Code = SGRParameter ~ SEPARATOR ~ to!string(ColorCode);
-				return Formatter(Code);
-			}
-			
-			Formatter Create256ColorFormatter(const double Red, const double Green, const double Blue)
-			in
-			{
-				assert (0.0 <= Red && Red <= 1.0);
-				assert (0.0 <= Green && Green <= 1.0);
-				assert (0.0 <= Blue && Blue <= 1.0);
-			}
-			body
-			{
-				// Somewhat incomplete conversion from RGB to xterm 256.  The xterm
-				// 256 palette has a separate grayscale ramp that this function
-				// currently makes no attempt to take advantage of.  That means that
-				// grayscale values passed to this function overload will end up being
-				// displayed with a significantly lower precision than what they
-				// potentially could be.
-				const uint IntegralRed = cast(uint)(Red * 5 + 0.5);
-				const uint IntegralGreen = cast(uint)(Green * 5 + 0.5);
-				const uint IntegralBlue = cast(uint)(Blue * 5 + 0.5);
-				
-				const uint ColorCode = IntegralRed*36 + IntegralGreen*6 + IntegralBlue + 16;
-				
-				return Create256ColorFormatter!SGRParameter(ColorCode);
-			}
-		}
-	}
 }
 
 immutable public
@@ -294,7 +239,4 @@ immutable public
 	auto noUnderline = Formatter(SGR_NO_UNDERLINE); /// ditto
 	
 	auto noFormatting = Formatter(SGR_RESET);
-	
-	alias customColor   = Create256ColorFormatter!SGR_TEXT_256_COLOR;
-	alias customColorBG = Create256ColorFormatter!SGR_BG_256_COLOR; /// ditto
 }
