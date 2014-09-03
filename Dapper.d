@@ -34,7 +34,6 @@ import std.conv;
 private immutable
 {
 	string CSI = "\033["; // \033 is octal for the ESC character.
-	string SEPARATOR = ";";
 	string SGR_RESET = "0";
 	string SGR_TERMINATOR = "m";
 }
@@ -153,7 +152,7 @@ private struct ArgumentRelayer
 
 public @safe nothrow pure Formatter customColor(double r, double g, double b)
 {
-	return Formatter("38" ~ SEPARATOR ~ "5" ~ SEPARATOR ~ to!string(rgbToXterm(r, g, b)));
+	return Formatter("38;5;" ~ to!string(rgbToXterm(r, g, b)));
 }
 
 immutable public
