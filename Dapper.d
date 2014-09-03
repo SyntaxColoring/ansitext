@@ -30,6 +30,7 @@ module Dapper;
 
 import std.stdio;
 import std.conv;
+import std.array: join;
 
 private immutable
 {
@@ -158,6 +159,13 @@ public @safe nothrow pure Formatter customColor(double r, double g, double b)
 public @safe nothrow pure Formatter customColorBG(double r, double g, double b)
 {
 	return Formatter("48;5;" ~ to!string(rgbToXterm(r, g, b)));
+}
+
+public @safe nothrow pure Formatter merge(const Formatter[] formatters...)
+{
+	string[] sgrParameters;
+	foreach (Formatter formatter; formatters) sgrParameters ~= formatter.sgrParameters;
+	return Formatter(sgrParameters.join(";"));
 }
 
 immutable public
