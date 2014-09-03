@@ -120,7 +120,7 @@ private
 			 * from another formatter and that it must be handled specially so
 			 * that nesting works.
 			 *
-			 * For example, in Red(Green("A", "B"), "C"), the Red formatter receives
+			 * For example, in red(green("A", "B"), "C"), the red formatter receives
 			 * "A" and "B" in an ArgumentRelayer so that it can work with them
 			 * separately instead of as a single argument "AB."
 			 *
@@ -131,14 +131,14 @@ private
 			 **/
 		private struct ArgumentRelayer
 		{
-			string[] Arguments;
+			string[] arguments;
 			
 			string toString() const
 			{
-				string ConcatenatedArguments;
-				foreach (Argument; Arguments)
+				string concatenatedArguments;
+				foreach (argument; arguments)
 				{
-					ConcatenatedArguments ~= Argument;
+					concatenatedArguments ~= argument;
 					
 					// The Formatter that created this ArgumentRelayer has
 					// already prepended all the necessary SGR codes to the contained
@@ -152,9 +152,9 @@ private
 					// Formatter.opCall() is to avoid arguments being appended
 					// with many redundant reset codes as they propagate through many
 					// layers of Formatters.
-					ConcatenatedArguments ~= CSI ~ SGR_RESET ~ SGR_TERMINATOR;
+					concatenatedArguments ~= CSI ~ SGR_RESET ~ SGR_TERMINATOR;
 				}
-				return ConcatenatedArguments;
+				return concatenatedArguments;
 			}
 			
 			// ArgumentRelayers must occasionally be casted manually by calling code,
@@ -163,28 +163,28 @@ private
 			string opCast(Type:string)() const { return toString(); }
 		}
 		
-		private const string SGRParameter;
+		private const string sgrParameter;
 		
 		@disable this();
-		this(const string SGRParameter) { this.SGRParameter = SGRParameter; }
+		this(const string sgrParameter) { this.sgrParameter = sgrParameter; }
 		
-		// This is what calling code calls.  writeln(Red("Foo")) is actually
-		// writeln(Red.opCall("Foo")).
-		ArgumentRelayer opCall(Types...)(Types IncomingArguments) const
+		// This is what calling code calls.  writeln(red("Foo")) is actually
+		// writeln(red.opCall("Foo")).
+		ArgumentRelayer opCall(Types...)(Types incomingArguments) const
 		{
-			string[] OutgoingArguments;
+			string[] outgoingArguments;
 			
-			foreach (IncomingArgument; IncomingArguments)
+			foreach (incomingArgument; incomingArguments)
 			{
 				// If this formatter has received a pack of arguments relayed from
 				// a more deeply-nested one, it needs to apply the code to each of
 				// those relayed arguments individually.
-				static if (is(typeof(IncomingArgument) == ArgumentRelayer))
+				static if (is(typeof(incomingArgument) == ArgumentRelayer))
 				{	
-					ArgumentRelayer IncomingArgumentRelayer = IncomingArgument;
-					foreach (string RelayedArgument; IncomingArgumentRelayer.Arguments)
+					ArgumentRelayer incomingArgumentRelayer = incomingArgument;
+					foreach (string relayedArgument; incomingArgumentRelayer.arguments)
 					{
-						OutgoingArguments ~= (CSI ~ SGRParameter ~ SGR_TERMINATOR ~ RelayedArgument);
+						outgoingArguments ~= (CSI ~ sgrParameter ~ SGR_TERMINATOR ~ relayedArgument);
 					}
 				}
 				
@@ -196,12 +196,12 @@ private
 					// Using to!string emulates writeln's flexibility with the types
 					// of its arguments.  Calling code doesn't have to cast anything
 					// that it wants to output through a formatter.
-					OutgoingArguments ~= (CSI ~ SGRParameter ~ SGR_TERMINATOR ~ to!string(IncomingArgument));
+					outgoingArguments ~= (CSI ~ sgrParameter ~ SGR_TERMINATOR ~ to!string(incomingArgument));
 				}
 			}
 			
 			// Pass the arguments on to the enclosing level of the nest.
-			return ArgumentRelayer(OutgoingArguments);
+			return ArgumentRelayer(outgoingArguments);
 		}
 	}
 	
