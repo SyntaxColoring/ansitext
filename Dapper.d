@@ -1,5 +1,5 @@
 	/**
-	 * Dapper - Stylish enhancements for D standard output.
+	 * Dapper - Stylish ANSI terminal support for D.
 	 * 
 	 * See ReadMe.md for an introduction and API reference.
 	 * 
