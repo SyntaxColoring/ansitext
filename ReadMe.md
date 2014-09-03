@@ -30,7 +30,8 @@ void main()
 	
 	writeln("Formatters can be applied to ", blue("portions"), " of text.");
 	
-	writeln("Formatters ", yellowBG("can be ", blue("nested"), " and ", blue("combined.")));
+	writeln("Formatters ",
+	        yellowBG("can be ", blue("nested"), " and ", blue("combined.")));
 }
 ```
 
@@ -120,7 +121,7 @@ In such cases, it might be convenient to *merge* those formatters into one.  The
 whatever formatters you pass it.  Use it like this:
 
 ```d
-auto highlight = merge(bold, white, yellow);
+auto highlight = merge(bold, white, yellowBG);
 
 writeln("Highlight ",          highlight("this,"));
 writeln("and also highlight ", highlight("that."));
