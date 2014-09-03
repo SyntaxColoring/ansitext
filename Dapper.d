@@ -272,7 +272,7 @@ immutable public
 	auto cyan      = Formatter(SGR_TEXT_CYAN);
 	auto white     = Formatter(SGR_TEXT_WHITE);
 	
-	auto blackBG   = Formatter(SGR_BG_RED);
+	auto blackBG   = Formatter(SGR_BG_BLACK);
 	auto redBG     = Formatter(SGR_BG_RED);
 	auto greenBG   = Formatter(SGR_BG_GREEN);
 	auto yellowBG  = Formatter(SGR_BG_YELLOW);
