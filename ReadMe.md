@@ -84,25 +84,23 @@ Formatter Listing: Other Formatters
 Making Your Own Color Formatters
 --------------------------------
 
-If none of the 8 predefined colors work for you, you can also make your own like
-this:
+The predefined colors listed above are usually good enough, but sometimes you
+need to make your own.  To do so, use the `customColor()` and `customBGColor()`
+functions, which take RGB values and return new formatters.
 
 ```d
-// With red, green, blue components from 0.0 to 1.0
-auto pink1 = Formatter.forColor(1.0, 0.08, 0.58);
+// Define a color by its red, green and blue components (each from 0.0 to 1.0).
+auto pink = customColor(1.0, 0.08, 0.58);
+auto pinkBG = customColorBG(1.0, 0.08, 0.58);
 
-// With an index into the XTerm 256-color palette
-auto pink2 = Formatter.forColor(199);
-
-// It works the same way for background colors.
-auto pink1BG = Formatter.forBGColor(1.0, 0.08, 0.58);
-auto pink2BG = Formatter.forBGColor(199);
+// Use your new formatters the same way you use the predefined ones.
+writeln("Pretty in ", pinkBG("pink."));
 ```
 
-Then, use them like you would any other formatter.
+Alternatively, you can create your custom color formatter inline:
 
 ```d
-writeln("My favorite color is ", pink1("pink."));
+writeln("Pretty in ", customColorBG(1.0, 0.08, 0.58)("pink."));
 ```
 
 Merging Formatters

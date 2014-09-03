@@ -155,6 +155,11 @@ public @safe nothrow pure Formatter customColor(double r, double g, double b)
 	return Formatter("38;5;" ~ to!string(rgbToXterm(r, g, b)));
 }
 
+public @safe nothrow pure Formatter customColorBG(double r, double g, double b)
+{
+	return Formatter("48;5;" ~ to!string(rgbToXterm(r, g, b)));
+}
+
 immutable public
 {	
 	Formatter defaultColor   = Formatter("39");
