@@ -43,6 +43,11 @@ public struct Formatter
 {
 	string sgrParameters;
 	
+	this(const string sgrParameters...)
+	{
+		this.sgrParameters = sgrParameters;
+	}
+	
 	ArgumentRelayer opCall(Types...)(Types incomingArguments) const
 	{
 		string[] outgoingArguments;
@@ -130,34 +135,34 @@ private struct ArgumentRelayer
 
 immutable public
 {	
-	Formatter defaultColor   = {"39"};
-	Formatter black          = {"30"};
-	Formatter red            = {"31"};
-	Formatter green          = {"32"};
-	Formatter yellow         = {"33"};
-	Formatter blue           = {"34"};
-	Formatter magenta        = {"35"};
-	Formatter cyan           = {"36"};
-	Formatter white          = {"37"};
+	Formatter defaultColor   = Formatter("39");
+	Formatter black          = Formatter("30");
+	Formatter red            = Formatter("31");
+	Formatter green          = Formatter("32");
+	Formatter yellow         = Formatter("33");
+	Formatter blue           = Formatter("34");
+	Formatter magenta        = Formatter("35");
+	Formatter cyan           = Formatter("36");
+	Formatter white          = Formatter("37");
 	
-	Formatter defaultColorBG = {"49"};
-	Formatter blackBG        = {"40"};
-	Formatter redBG          = {"41"};
-	Formatter greenBG        = {"42"};
-	Formatter yellowBG       = {"43"};
-	Formatter blueBG         = {"44"};
-	Formatter magentaBG      = {"45"};
-	Formatter cyanBG         = {"46"};
-	Formatter whiteBG        = {"47"};
+	Formatter defaultColorBG = Formatter("49");
+	Formatter blackBG        = Formatter("40");
+	Formatter redBG          = Formatter("41");
+	Formatter greenBG        = Formatter("42");
+	Formatter yellowBG       = Formatter("43");
+	Formatter blueBG         = Formatter("44");
+	Formatter magentaBG      = Formatter("45");
+	Formatter cyanBG         = Formatter("46");
+	Formatter whiteBG        = Formatter("47");
 	
-	Formatter bold           = {"1"};
-	Formatter noBold         = {"22"};
+	Formatter bold           = Formatter("1");
+	Formatter noBold         = Formatter("22");
 	
-	Formatter blink          = {"5"};
-	Formatter noBlink        = {"25"};
+	Formatter blink          = Formatter("5");
+	Formatter noBlink        = Formatter("25");
 	
-	Formatter underline      = {"4"};
-	Formatter noUnderline    = {"24"};
+	Formatter underline      = Formatter("4");
+	Formatter noUnderline    = Formatter("24");
 	
-	Formatter noFormatting   = {SGR_RESET};
+	Formatter noFormatting   = Formatter(SGR_RESET);
 }
