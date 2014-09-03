@@ -28,8 +28,7 @@
 
 module Dapper;
 
-import std.stdio;
-import std.conv;
+import std.conv: to;
 import std.array: join;
 
 private immutable
