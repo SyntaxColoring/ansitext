@@ -34,66 +34,9 @@ import std.conv;
 private immutable
 {
 	string CSI = "\033["; // \033 is octal for the ESC character.
-	
 	string SEPARATOR = ";";
-	
-	string SGR_TERMINATOR = "m";
-	
-	string SGR_TEXT_BLACK = "30";
-	string SGR_TEXT_RED = "31";
-	string SGR_TEXT_GREEN = "32";
-	string SGR_TEXT_YELLOW = "33";
-	string SGR_TEXT_BLUE = "34";
-	string SGR_TEXT_MAGENTA = "35";
-	string SGR_TEXT_CYAN = "36";
-	string SGR_TEXT_WHITE = "37";
-	
-	string SGR_BG_BLACK = "40";
-	string SGR_BG_RED = "41";
-	string SGR_BG_GREEN = "42";
-	string SGR_BG_YELLOW = "43";
-	string SGR_BG_BLUE = "44";
-	string SGR_BG_MAGENTA = "45";
-	string SGR_BG_CYAN = "46";
-	string SGR_BG_WHITE = "47";
-	
-	string SGR_TEXT_COLORLESS = "39";
-	string SGR_BG_COLORLESS = "49";
-	
-		/**
-		 * SGR parameter that sets the text or background color using the
-		 * $(HTTP upload.wikimedia.org/wikipedia/commons/9/95/Xterm_color_chart.png xterm 256 color palette.)
-		 *
-		 * The next parameter (separated by $(MREF SEPARATOR)) must be an integer from 0 to 255
-		 * referencing the desired color.
-		 * $(HTTP www.mudpedia.org/mediawiki/index.php/Xterm_256_colors#RGB_Colors Mudpedia)
-		 * has a good description of how the palette works.  Note that colors 0-7 and 8-15 are equivalent
-		 * to the color presets above without and with $(MREF SGR_BOLD), respectively.
-		 *
-		 * Unlike the color presets defined above, the terminal color scheme cannot
-		 * override these colors.  The xterm 256 color palette is, however, a nonstandard extension,
-		 * although it's basically ubiquitous in modern terminal emulators.
-		 *
-		 * Examples:
-		 * ---
-		 * writeln(CSI, SGR_TEXT_256_COLOR, SEPARATOR, 202, SGR_TERMINATOR);
-		 * writeln("202 is orange in the xterm 256 palette, so this text will be orange.");
-		 * writeln(CSI, SGR_RESET, SGR_TERMINATOR);
-		 * ---
-		 **/
-	string SGR_TEXT_256_COLOR = "38" ~ SEPARATOR ~ "5";
-	string SGR_BG_256_COLOR = "48" ~ SEPARATOR ~ "5"; /// ditto
-	
-	string SGR_BOLD = "1";
-	string SGR_NO_BOLD = "22"; /// ditto
-	
-	string SGR_BLINK = "5";
-	string SGR_NO_BLINK = "25"; /// ditto
-	
-	string SGR_UNDERLINE = "4";
-	string SGR_NO_UNDERLINE = "24"; /// ditto
-	
 	string SGR_RESET = "0";
+	string SGR_TERMINATOR = "m";
 }
 
 private
@@ -207,36 +150,35 @@ private
 }
 
 immutable public
-{
-	auto black     = Formatter(SGR_TEXT_BLACK);
-	auto red       = Formatter(SGR_TEXT_RED);
-	auto green     = Formatter(SGR_TEXT_GREEN);
-	auto yellow    = Formatter(SGR_TEXT_YELLOW);
-	auto blue      = Formatter(SGR_TEXT_BLUE);
-	auto magenta   = Formatter(SGR_TEXT_MAGENTA);
-	auto cyan      = Formatter(SGR_TEXT_CYAN);
-	auto white     = Formatter(SGR_TEXT_WHITE);
+{	
+	auto defaultColor   = Formatter("39");
+	auto black          = Formatter("30");
+	auto red            = Formatter("31");
+	auto green          = Formatter("32");
+	auto yellow         = Formatter("33");
+	auto blue           = Formatter("34");
+	auto magenta        = Formatter("35");
+	auto cyan           = Formatter("36");
+	auto white          = Formatter("37");
 	
-	auto blackBG   = Formatter(SGR_BG_BLACK);
-	auto redBG     = Formatter(SGR_BG_RED);
-	auto greenBG   = Formatter(SGR_BG_GREEN);
-	auto yellowBG  = Formatter(SGR_BG_YELLOW);
-	auto blueBG    = Formatter(SGR_BG_BLUE);
-	auto magentaBG = Formatter(SGR_BG_MAGENTA);
-	auto cyanBG    = Formatter(SGR_BG_CYAN);
-	auto whiteBG   = Formatter(SGR_BG_WHITE);
+	auto defaultColorBG = Formatter("49");
+	auto blackBG        = Formatter("40");
+	auto redBG          = Formatter("41");
+	auto greenBG        = Formatter("42");
+	auto yellowBG       = Formatter("43");
+	auto blueBG         = Formatter("44");
+	auto magentaBG      = Formatter("45");
+	auto cyanBG         = Formatter("46");
+	auto whiteBG        = Formatter("47");
 	
-	auto noColor   = Formatter(SGR_TEXT_COLORLESS);
-	auto noColorBG = Formatter(SGR_BG_COLORLESS); /// ditto
+	auto bold   = Formatter("1");
+	auto noBold = Formatter("22");
 	
-	auto bold   = Formatter(SGR_BOLD);
-	auto noBold = Formatter(SGR_NO_BOLD); /// ditto
+	auto blink   = Formatter("5");
+	auto noBlink = Formatter("25");
 	
-	auto blink   = Formatter(SGR_BLINK);
-	auto noBlink = Formatter(SGR_NO_BLINK); /// ditto
-	
-	auto underline   = Formatter(SGR_UNDERLINE);
-	auto noUnderline = Formatter(SGR_NO_UNDERLINE); /// ditto
+	auto underline   = Formatter("4");
+	auto noUnderline = Formatter("24");
 	
 	auto noFormatting = Formatter(SGR_RESET);
 }
