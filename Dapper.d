@@ -39,6 +39,24 @@ private immutable
 	string SGR_TERMINATOR = "m";
 }
 
+// Converts RGB coordinates to an XTerm 256-color palette index.
+private @safe pure ubyte rgbToXterm(double red, double green, double blue)
+in
+{
+	assert(red   >= 0.0 && red   <= 1.0, "RGB channels should be from 0 to 1.");
+	assert(green >= 0.0 && green <= 1.0, "RGB channels should be from 0 to 1.");
+	assert(blue  >= 0.0 && blue  <= 1.0, "RGB channels should be from 0 to 1.");
+}
+body
+{
+	// Convert from 0-1 to 0-5, rounding to the nearest integer.
+	const uint integralRed   = cast(uint)(  red*5 + 0.5);
+	const uint integralGreen = cast(uint)(green*5 + 0.5);
+	const uint integralBlue  = cast(uint)( blue*5 + 0.5);
+	
+	return cast(ubyte)(16 + integralRed*36 + integralGreen*6 + integralBlue);
+}
+
 public struct Formatter
 {
 	string sgrParameters;
