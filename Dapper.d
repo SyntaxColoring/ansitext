@@ -70,7 +70,7 @@ public struct Formatter
 {
 	string sgrParameters;
 	
-	@safe nothrow pure this(const string sgrParameters...)
+	@safe nothrow pure this(const string sgrParameters)
 	{
 		this.sgrParameters = sgrParameters;
 	}
