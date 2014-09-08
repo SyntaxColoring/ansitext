@@ -56,16 +56,6 @@ body
 	return cast(ubyte)(16 + integralRed*36 + integralGreen*6 + integralBlue);
 }
 
-unittest
-{
-	assert(rgbToXterm(0.0, 0.0, 0.0) == 16);
-	assert(rgbToXterm(1.0, 1.0, 1.0) == 231);
-	
-	assert(rgbToXterm(1.0, 0.0, 0.0) == 196);
-	assert(rgbToXterm(0.0, 1.0, 0.0) == 46);
-	assert(rgbToXterm(0.0, 0.0, 1.0) == 21);
-}
-
 public struct Formatter
 {
 	string sgrParameters;
@@ -209,9 +199,4 @@ immutable public
 	Formatter noUnderline    = Formatter("24");
 	
 	Formatter noFormatting   = Formatter(SGR_RESET);
-}
-
-version(unittest)
-{
-	void main() { }
 }
