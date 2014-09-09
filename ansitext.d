@@ -32,9 +32,9 @@ import std.conv: text;
 
 private:
 
-immutable CSI = "\033["; // \033 is octal for the ESC character.
-immutable SGR_RESET = "0";
-immutable SGR_TERMINATOR = "m";
+immutable csi = "\033["; // \033 is octal for the ESC character.
+immutable sgrReset = "0";
+immutable sgrEnd = "m";
 
 /// Converts RGB coordinates to an XTerm 256-color palette index.
 pure nothrow @safe @nogc ubyte rgbToXterm(const double red, const double green, const double blue)
@@ -66,7 +66,7 @@ struct FormattedString
 	
 	nothrow @safe string toString() pure
 	{
-		return (parts ~ "").join(CSI ~ SGR_RESET ~ SGR_TERMINATOR);
+		return (parts ~ "").join(csi ~ sgrReset ~ sgrEnd);
 	}
 	
 	alias toString this;
@@ -99,7 +99,7 @@ struct Formatter
 				FormattedString incomingFormattedString = incomingArgument;
 				foreach (string relayedArgument; incomingFormattedString.parts)
 				{
-					outgoingArguments ~= (CSI ~ sgrParameters ~ SGR_TERMINATOR ~ relayedArgument);
+					outgoingArguments ~= (csi ~ sgrParameters ~ sgrEnd ~ relayedArgument);
 				}
 			}
 			
@@ -111,7 +111,7 @@ struct Formatter
 				// Using to!string emulates writeln's flexibility with the types
 				// of its arguments.  Calling code doesn't have to cast anything
 				// that it wants to output through a formatter.
-				outgoingArguments ~= (CSI ~ sgrParameters ~ SGR_TERMINATOR ~ text(incomingArgument));
+				outgoingArguments ~= (csi ~ sgrParameters ~ sgrEnd ~ text(incomingArgument));
 			}
 		}
 		
@@ -168,5 +168,5 @@ immutable
 	Formatter underline      = "4";
 	Formatter noUnderline    = "24";
 	
-	Formatter noFormatting   = SGR_RESET;
+	Formatter noFormatting   = sgrReset;
 }
