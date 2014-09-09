@@ -27,19 +27,17 @@
 	 **/
 
 module Dapper;
-
-import std.conv: to;
 import std.array: join;
+import std.conv: text;
 
-private immutable
-{
-	string CSI = "\033["; // \033 is octal for the ESC character.
-	string SGR_RESET = "0";
-	string SGR_TERMINATOR = "m";
-}
+private:
 
-// Converts RGB coordinates to an XTerm 256-color palette index.
-private @safe nothrow pure ubyte rgbToXterm(double red, double green, double blue)
+immutable CSI = "\033["; // \033 is octal for the ESC character.
+immutable SGR_RESET = "0";
+immutable SGR_TERMINATOR = "m";
+
+/// Converts RGB coordinates to an XTerm 256-color palette index.
+pure nothrow @safe @nogc ubyte rgbToXterm(const double red, const double green, const double blue)
 in
 {
 	assert(red   >= 0.0 && red   <= 1.0, "RGB channels should be from 0 to 1.");
@@ -56,16 +54,38 @@ body
 	return cast(ubyte)(16 + integralRed*36 + integralGreen*6 + integralBlue);
 }
 
-public struct Formatter
+/// Helper struct for preserving the separateness of arguments passed to
+/// formatters.  This is needed to properly handle nesting.
+///
+/// For example, in red(green("A", "B"), "C"), the red formatter receives
+/// "A" and "B" in an FormattedString so that it can work with them
+/// separately instead of as a single argument "AB."
+struct FormattedString
+{
+	string[] parts;
+	
+	nothrow @safe string toString() pure
+	{
+		return (parts ~ "").join(CSI ~ SGR_RESET ~ SGR_TERMINATOR);
+	}
+	
+	alias toString this;
+}
+
+public:
+
+/// Generalized functor for all formatters.  Wraps an SGR code to support
+/// nesting semantics.
+struct Formatter
 {
 	string sgrParameters;
 	
-	@safe nothrow pure this(const string sgrParameters)
+	nothrow @safe this(string sgrParameters) pure
 	{
 		this.sgrParameters = sgrParameters;
 	}
 	
-	@safe nothrow pure ArgumentRelayer opCall(Types...)(Types incomingArguments) const
+	nothrow @safe FormattedString opCall(Types...)(Types incomingArguments) const pure
 	{
 		string[] outgoingArguments;
 		
@@ -74,10 +94,10 @@ public struct Formatter
 			// If this formatter has received a pack of arguments relayed from
 			// a more deeply-nested one, it needs to apply the code to each of
 			// those relayed arguments individually.
-			static if (is(typeof(incomingArgument) == ArgumentRelayer))
+			static if (is(typeof(incomingArgument) == FormattedString))
 			{	
-				ArgumentRelayer incomingArgumentRelayer = incomingArgument;
-				foreach (string relayedArgument; incomingArgumentRelayer.arguments)
+				FormattedString incomingFormattedString = incomingArgument;
+				foreach (string relayedArgument; incomingFormattedString.parts)
 				{
 					outgoingArguments ~= (CSI ~ sgrParameters ~ SGR_TERMINATOR ~ relayedArgument);
 				}
@@ -91,112 +111,62 @@ public struct Formatter
 				// Using to!string emulates writeln's flexibility with the types
 				// of its arguments.  Calling code doesn't have to cast anything
 				// that it wants to output through a formatter.
-				outgoingArguments ~= (CSI ~ sgrParameters ~ SGR_TERMINATOR ~ to!string(incomingArgument));
+				outgoingArguments ~= (CSI ~ sgrParameters ~ SGR_TERMINATOR ~ text(incomingArgument));
 			}
 		}
 		
 		// Pass the arguments on to the enclosing level of the nest.
-		return ArgumentRelayer(outgoingArguments);
+		return FormattedString(outgoingArguments);
 	}
 }
 
-	/**
-	 * Helper struct used to preserve the separateness of arguments passed
-	 * to deeply-nested formatters.  When an argument passed to a formatter
-	 * is of this type, it basically signals to that formatter that this came
-	 * from another formatter and that it must be handled specially so
-	 * that nesting works.
-	 *
-	 * For example, in red(green("A", "B"), "C"), the red formatter receives
-	 * "A" and "B" in an ArgumentRelayer so that it can work with them
-	 * separately instead of as a single argument "AB."
-	 *
-	 * At the outermost layer of the nest, writeln receives the ArgumentRelayers
-	 * and sees that they have the toString() member function defined.  When
-	 * writeln calls an ArgumentRelayer's toString(), the ArgumentRelayer
-	 * concatenates its contained text into its final outputted form.
-	 **/
-private struct ArgumentRelayer
+pure nothrow @safe Formatter customColor(double r, double g, double b)
 {
-	string[] arguments;
-	
-	string toString() const
-	{
-		string concatenatedArguments;
-		foreach (argument; arguments)
-		{
-			concatenatedArguments ~= argument;
-			
-			// The Formatter that created this ArgumentRelayer has
-			// already prepended all the necessary SGR codes to the contained
-			// arguments.  It has not, however, appended the reset code.
-			// That must be done here so that the next argument starts from
-			// a clean formatting state, and so the formatting state from the
-			// last argument doesn't persist to any text that comes after it
-			// that should be unformatted.
-			//
-			// The reason that this is done here instead of from within
-			// Formatter.opCall() is to avoid arguments being appended
-			// with many redundant reset codes as they propagate through many
-			// layers of Formatters.
-			concatenatedArguments ~= CSI ~ SGR_RESET ~ SGR_TERMINATOR;
-		}
-		return concatenatedArguments;
-	}
-	
-	// ArgumentRelayers must occasionally be casted manually by calling code,
-	// and the "cast(string)Foo" syntax is nicer than making people import std.conv
-	// so they can use "to!string(Foo)."
-	string opCast(Type:string)() const { return toString(); }
+	return Formatter("38;5;" ~ text(rgbToXterm(r, g, b)));
 }
 
-public @safe nothrow pure Formatter customColor(double r, double g, double b)
+pure nothrow @safe Formatter customColorBG(double r, double g, double b)
 {
-	return Formatter("38;5;" ~ to!string(rgbToXterm(r, g, b)));
+	return Formatter("48;5;" ~ text(rgbToXterm(r, g, b)));
 }
 
-public @safe nothrow pure Formatter customColorBG(double r, double g, double b)
-{
-	return Formatter("48;5;" ~ to!string(rgbToXterm(r, g, b)));
-}
-
-public @safe nothrow pure Formatter merge(const Formatter[] formatters...)
+pure nothrow @safe Formatter merge(const Formatter[] formatters...)
 {
 	string[] sgrParameters;
 	foreach (Formatter formatter; formatters) sgrParameters ~= formatter.sgrParameters;
 	return Formatter(sgrParameters.join(";"));
 }
 
-immutable public
+immutable
 {	
-	Formatter defaultColor   = Formatter("39");
-	Formatter black          = Formatter("30");
-	Formatter red            = Formatter("31");
-	Formatter green          = Formatter("32");
-	Formatter yellow         = Formatter("33");
-	Formatter blue           = Formatter("34");
-	Formatter magenta        = Formatter("35");
-	Formatter cyan           = Formatter("36");
-	Formatter white          = Formatter("37");
+	Formatter defaultColor   = "39";
+	Formatter black          = "30";
+	Formatter red            = "31";
+	Formatter green          = "32";
+	Formatter yellow         = "33";
+	Formatter blue           = "34";
+	Formatter magenta        = "35";
+	Formatter cyan           = "36";
+	Formatter white          = "37";
 	
-	Formatter defaultColorBG = Formatter("49");
-	Formatter blackBG        = Formatter("40");
-	Formatter redBG          = Formatter("41");
-	Formatter greenBG        = Formatter("42");
-	Formatter yellowBG       = Formatter("43");
-	Formatter blueBG         = Formatter("44");
-	Formatter magentaBG      = Formatter("45");
-	Formatter cyanBG         = Formatter("46");
-	Formatter whiteBG        = Formatter("47");
+	Formatter defaultColorBG = "49";
+	Formatter blackBG        = "40";
+	Formatter redBG          = "41";
+	Formatter greenBG        = "42";
+	Formatter yellowBG       = "43";
+	Formatter blueBG         = "44";
+	Formatter magentaBG      = "45";
+	Formatter cyanBG         = "46";
+	Formatter whiteBG        = "47";
 	
-	Formatter bold           = Formatter("1");
-	Formatter noBold         = Formatter("22");
+	Formatter bold           = "1";
+	Formatter noBold         = "22";
 	
-	Formatter blink          = Formatter("5");
-	Formatter noBlink        = Formatter("25");
+	Formatter blink          = "5";
+	Formatter noBlink        = "25";
 	
-	Formatter underline      = Formatter("4");
-	Formatter noUnderline    = Formatter("24");
+	Formatter underline      = "4";
+	Formatter noUnderline    = "24";
 	
-	Formatter noFormatting   = Formatter(SGR_RESET);
+	Formatter noFormatting   = SGR_RESET;
 }
