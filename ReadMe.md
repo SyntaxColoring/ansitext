@@ -39,12 +39,11 @@ Features
 ========
 - Formatters for bold, underlined and blinking text
 - Text color and background color formatters for the 8 system-defined colors
-- Define your own text and background colors with RGB coordinates or with a
-  number from the XTerm 256-color palette
-- Mix, match, stack and nest formatters to combine them any way you like
+- Define your own text and background colors by their RGB components
+- Mix, match, nest and merge formatters to combine their effects any way you like
 - Output function agnostic - use `writeln` from the standard library, or
   something else if you prefer
-- Small and simple API
+- Lightweight and extensible API
 
 API Reference
 =============
@@ -110,6 +109,7 @@ Sometimes, you might find yourself using the same combination of formatters
 over and over again, like this:
 
 ```d
+                               // Repetitive and annoying to type.
 writeln("Highlight ",          bold(white(yellowBG("this,"))));
 writeln("and also highlight ", bold(white(yellowBG("that."))));
 ```
