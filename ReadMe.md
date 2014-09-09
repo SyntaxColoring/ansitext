@@ -1,13 +1,13 @@
 Introduction
 ============
-Dapper provides D support for the text formatting subset of
+`ansitext` provides D support for the text formatting subset of
 [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code).  ANSI
 escape codes are a set of special output sequences that let you do things like
 output colored text or clear part of the terminal window.
 
-Dapper is licensed under the permissive
+`ansitext` is licensed under the permissive
 [MIT license](http://choosealicense.com/licenses/mit/).  See the top of
-[Dapper.d](/Dapper.d) for details.
+[ansitext.d](/ansitext.d) for details.
 
 Usage Example
 =============
@@ -16,7 +16,7 @@ Usage Example
 
 ```d
 import std.stdio;
-import Dapper;
+import ansitext;
 
 void main()
 {

@@ -1,5 +1,5 @@
 	/**
-	 * Dapper - Stylish ANSI terminal support for D.
+	 * ansitext - Stylish ANSI terminal support for D.
 	 * 
 	 * See ReadMe.md for an introduction and API reference.
 	 * 
@@ -26,7 +26,7 @@
 	 * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 **/
 
-module Dapper;
+module ansitext;
 import std.array: join;
 import std.conv: text;
 
