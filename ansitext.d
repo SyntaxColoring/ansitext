@@ -30,6 +30,8 @@ module ansitext;
 import std.array: join;
 import std.conv: text;
 
+version(unittest) void main() { }
+
 private:
 
 immutable csi = "\033["; // \033 is octal for the ESC character.
@@ -179,9 +181,4 @@ immutable
 	Formatter noUnderline    = "24";
 	
 	Formatter noFormatting   = sgrReset;
-}
-
-version(unittest)
-{
-	void main() { }
 }
