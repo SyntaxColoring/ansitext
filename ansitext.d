@@ -57,7 +57,7 @@ body
 	return cast(ubyte)(16 + integralRed*36 + integralGreen*6 + integralBlue);
 }
 
-pure nothrow @safe @nogc unittest
+unittest
 {
 	assert(rgbToXterm(0.0, 0.0, 0.0) == 16);  // Black.
 	assert(rgbToXterm(1.0, 1.0, 1.0) == 231); // White.
@@ -93,12 +93,13 @@ struct Formatter
 {
 	string sgrParameters;
 	
-	nothrow @safe this(string sgrParameters) pure
+	this(string sgrParameters) pure nothrow @safe @nogc
 	{
 		this.sgrParameters = sgrParameters;
 	}
 	
-	nothrow @safe FormattedString opCall(Types...)(Types incomingArguments) const pure
+	FormattedString opCall(Types...)(Types incomingArguments)
+	const pure nothrow @safe
 	{
 		string[] outgoingArguments;
 		
@@ -133,17 +134,17 @@ struct Formatter
 	}
 }
 
-pure nothrow @safe Formatter customColor(double r, double g, double b)
+Formatter customColor(double r, double g, double b) pure nothrow @safe
 {
 	return Formatter("38;5;" ~ text(rgbToXterm(r, g, b)));
 }
 
-pure nothrow @safe Formatter customColorBG(double r, double g, double b)
+Formatter customColorBG(double r, double g, double b) pure nothrow @safe
 {
 	return Formatter("48;5;" ~ text(rgbToXterm(r, g, b)));
 }
 
-pure nothrow @safe Formatter merge(const Formatter[] formatters...)
+Formatter merge(const Formatter[] formatters...) pure nothrow @safe
 {
 	string[] sgrParameters;
 	foreach (Formatter formatter; formatters) sgrParameters ~= formatter.sgrParameters;
