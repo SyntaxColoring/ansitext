@@ -54,6 +54,16 @@ body
 	return cast(ubyte)(16 + integralRed*36 + integralGreen*6 + integralBlue);
 }
 
+unittest
+{
+	assert(rgbToXterm(0.0, 0.0, 0.0) == 16);
+	assert(rgbToXterm(1.0, 1.0, 1.0) == 231);
+	
+	assert(rgbToXterm(1.0, 0.0, 0.0) == 196);
+	assert(rgbToXterm(0.0, 1.0, 0.0) == 46);
+	assert(rgbToXterm(0.0, 0.0, 1.0) == 21);
+}
+
 /// Helper struct for preserving the separateness of arguments passed to
 /// formatters.  This is needed to properly handle nesting.
 ///
@@ -169,4 +179,9 @@ immutable
 	Formatter noUnderline    = "24";
 	
 	Formatter noFormatting   = sgrReset;
+}
+
+version(unittest)
+{
+	void main() { }
 }
