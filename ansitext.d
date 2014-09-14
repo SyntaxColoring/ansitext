@@ -64,7 +64,7 @@ struct FormattedString
 {
 	string[] parts;
 	
-	nothrow @safe string toString() pure
+	nothrow @safe string toString() const pure
 	{
 		return (parts ~ "").join(csi ~ sgrReset ~ sgrEnd);
 	}
