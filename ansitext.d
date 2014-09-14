@@ -39,7 +39,8 @@ immutable sgrReset = "0";
 immutable sgrEnd = "m";
 
 /// Converts RGB coordinates to an XTerm 256-color palette index.
-pure nothrow @safe @nogc ubyte rgbToXterm(const double red, const double green, const double blue)
+ubyte rgbToXterm(const double red, const double green, const double blue)
+pure nothrow @safe @nogc
 in
 {
 	assert(red   >= 0.0 && red   <= 1.0, "RGB channels should be from 0 to 1.");
@@ -56,14 +57,14 @@ body
 	return cast(ubyte)(16 + integralRed*36 + integralGreen*6 + integralBlue);
 }
 
-unittest
+pure nothrow @safe @nogc unittest
 {
-	assert(rgbToXterm(0.0, 0.0, 0.0) == 16);
-	assert(rgbToXterm(1.0, 1.0, 1.0) == 231);
+	assert(rgbToXterm(0.0, 0.0, 0.0) == 16);  // Black.
+	assert(rgbToXterm(1.0, 1.0, 1.0) == 231); // White.
 	
-	assert(rgbToXterm(1.0, 0.0, 0.0) == 196);
-	assert(rgbToXterm(0.0, 1.0, 0.0) == 46);
-	assert(rgbToXterm(0.0, 0.0, 1.0) == 21);
+	assert(rgbToXterm(1.0, 0.0, 0.0) == 196); // Red.
+	assert(rgbToXterm(0.0, 1.0, 0.0) == 46);  // Green.
+	assert(rgbToXterm(0.0, 0.0, 1.0) == 21);  // Blue.
 }
 
 /// Helper struct for preserving the separateness of arguments passed to
