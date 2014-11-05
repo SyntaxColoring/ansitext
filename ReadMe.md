@@ -1,13 +1,15 @@
 Introduction
 ============
-`ansitext` provides D support for the text formatting subset of
-[ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code).  ANSI
-escape codes are a set of special output sequences that let you do things like
-output colored text or clear part of the terminal window.
+`ansitext` is a D module for using the text formatting subset of
+[ANSI escape codes][].  Basically, it lets you add colors (and more) to your
+terminal output.
 
-`ansitext` is licensed under the permissive
-[ISC license](http://choosealicense.com/licenses/isc/).  See the top of
-[ansitext.d](/ansitext.d) for details.
+`ansitext` is licensed under the permissive [ISC license][].  See the top of
+[ansitext.d][] for details.
+
+[ANSI escape codes]: https://en.wikipedia.org/wiki/ANSI_escape_code
+[ISC license]: http://choosealicense.com/licenses/isc/
+[ansitext.d]: source/ansitext.d
 
 Usage Example
 =============
@@ -40,10 +42,8 @@ Features
 - Formatters for bold, underlined and blinking text
 - Text color and background color formatters for the 8 system-defined colors
 - Define your own text and background colors by their RGB components
-- Nest and combine formatters to mix their effects any way you like
-- Output function agnostic - use `writeln` from the standard library, or
-  something else if you prefer
-- Lightweight and extensible API
+- Arbitrarily nest and combine formatters to mix their effects
+- Light and extensible API
 
 API Reference
 =============
