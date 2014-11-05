@@ -6,7 +6,7 @@ escape codes are a set of special output sequences that let you do things like
 output colored text or clear part of the terminal window.
 
 `ansitext` is licensed under the permissive
-[MIT license](http://choosealicense.com/licenses/mit/).  See the top of
+[ISC license](http://choosealicense.com/licenses/isc/.  See the top of
 [ansitext.d](/ansitext.d) for details.
 
 Usage Example

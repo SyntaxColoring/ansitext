@@ -1,25 +1,21 @@
-	/**
-	 * ansitext - Stylish ANSI terminal support for D.
-	 * 
-	 * See ReadMe.md for an introduction and API reference.
-	 * 
-	 * 
-	 * License:
-	 * 
-	 * Copyright (c) 2013 Max Marrone <SyntaxColoring@gmail.com>
-	 
-	 * Permission to use, copy, modify, and/or distribute this software for any
-	 * purpose with or without fee is hereby granted, provided that the above
-	 * copyright notice and this permission notice appear in all copies.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-	 * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-	 * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-	 * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-	 * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-	 * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-	 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-	 **/
+/* ansitext - Stylish ANSI terminal support for D.
+ * https://github.com/SyntaxColoring/ansitext
+ * See ReadMe.md for an introduction and API reference.
+ * 
+ * Copyright (c) 2013 Max Marrone <SyntaxColoring@gmail.com>
+ * 
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 
 module ansitext;
 import std.array: join;
@@ -31,7 +27,7 @@ immutable csi = "\033["; // \033 is octal for the ESC character.
 immutable sgrReset = "0";
 immutable sgrEnd = "m";
 
-/// Converts RGB coordinates to an XTerm 256-color palette index.
+// Converts RGB coordinates to an XTerm 256-color palette index.
 ubyte rgbToXterm(const double red, const double green, const double blue)
 pure nothrow @safe @nogc
 in
@@ -60,12 +56,12 @@ unittest
 	assert(rgbToXterm(0.0, 0.0, 1.0) == 21);  // Blue.
 }
 
-/// Helper struct for preserving the separateness of arguments passed to
-/// formatters.  This is needed to properly handle nesting.
-///
-/// For example, in red(green("A", "B"), "C"), the red formatter receives
-/// "A" and "B" in an FormattedString so that it can work with them
-/// separately instead of as a single argument "AB."
+// Helper struct for preserving the separateness of arguments passed to
+// formatters.  This is needed to properly handle nesting.
+//
+// For example, in red(green("A", "B"), "C"), the red formatter receives
+// "A" and "B" in an FormattedString so that it can work with them
+// separately instead of as a single argument "AB."
 struct FormattedString
 {
 	string[] parts;
@@ -80,8 +76,8 @@ struct FormattedString
 
 public:
 
-/// Generalized functor for all formatters.  Wraps an SGR code to support
-/// nesting semantics.
+// Generalized functor for all formatters.  Wraps an SGR code to support
+// nesting semantics.
 struct Formatter
 {
 	string sgrParameters;
