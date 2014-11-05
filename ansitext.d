@@ -77,10 +77,12 @@ struct FormattedString
 {
 	string[] parts;
 	
-	string toString() const pure nothrow @safe
+	string opCast(string)() const pure nothrow @safe
 	{
 		return (parts ~ "").join(csi ~ sgrReset ~ sgrEnd);
 	}
+	
+	alias toString = opCast!string;
 }
 
 public:
