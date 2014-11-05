@@ -40,7 +40,7 @@ Features
 - Formatters for bold, underlined and blinking text
 - Text color and background color formatters for the 8 system-defined colors
 - Define your own text and background colors by their RGB components
-- Mix, match, nest and merge formatters to combine their effects any way you like
+- Nest and combine formatters to mix their effects any way you like
 - Output function agnostic - use `writeln` from the standard library, or
   something else if you prefer
 - Lightweight and extensible API
@@ -102,8 +102,8 @@ Alternatively, you can create your custom color formatter inline:
 writeln("Pretty in ", customColorBG(1.0, 0.08, 0.58)("pink."));
 ```
 
-Merging Formatters
-------------------
+Combining Formatters
+--------------------
 
 Sometimes, you might find yourself using the same combination of formatters
 over and over again, like this:
@@ -114,15 +114,14 @@ writeln("Highlight ",          bold(white(yellowBG("this,"))));
 writeln("and also highlight ", bold(white(yellowBG("that."))));
 ```
 
-In such cases, it might be convenient to *merge* those formatters into one.  The
-`merge()` function returns a new formatter created from the combined effects of
-whatever formatters you pass it.  Use it like this:
+In such cases, it might be convenient to *combine* those formatters into one.
+You can do this with the `+` operator.  Use it like this:
 
 ```d
-auto highlight = merge(bold, white, yellowBG);
+auto highlight = bold + white + yellowBG;
 
 writeln("Highlight ",          highlight("this,"));
 writeln("and also highlight ", highlight("that."));
 ```
 
-Merging formatters like this can improve readability and maintainability.
+Combining formatters like this can improve readability and maintainability.
