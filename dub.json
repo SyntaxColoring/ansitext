@@ -1,0 +1,9 @@
+{
+	"name": "ansitext",
+	"description": "Stylish ANSI terminal support for D.",
+	"homepage": "https://github.com/SyntaxColoring/ansitext",
+	"authors": ["Max Marrone"],
+	"license": "MIT",
+	"copyright": "Copyright (c) 2013 Max Marrone <SyntaxColoring@gmail.com>",
+	"targetType": "library"
+}
