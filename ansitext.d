@@ -132,6 +132,12 @@ struct Formatter
 		// Pass the arguments on to the enclosing level of the nest.
 		return FormattedString(outgoingArguments);
 	}
+	
+	Formatter opBinary(string op: "+")(const Formatter other)
+	const pure nothrow @safe
+	{
+		return Formatter(sgrParameters ~ ";" ~ other.sgrParameters);
+	}
 }
 
 Formatter customColor(double r, double g, double b) pure nothrow @safe
@@ -142,13 +148,6 @@ Formatter customColor(double r, double g, double b) pure nothrow @safe
 Formatter customColorBG(double r, double g, double b) pure nothrow @safe
 {
 	return Formatter("48;5;" ~ text(rgbToXterm(r, g, b)));
-}
-
-Formatter merge(const Formatter[] formatters...) pure nothrow @safe
-{
-	string[] sgrParameters;
-	foreach (Formatter formatter; formatters) sgrParameters ~= formatter.sgrParameters;
-	return Formatter(sgrParameters.join(";"));
 }
 
 immutable
